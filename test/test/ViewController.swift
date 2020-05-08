@@ -18,10 +18,12 @@ class ViewController: UIViewController {
         //        let sortArr = self.optimizeChoiceSort(arr: arr)
         
         /***** 插入 **/
-//        let sortArr = self.optimizeInsertionSort(arr: arr)
+        //        let sortArr = self.optimizeInsertionSort(arr: arr)
         
         /***** 希尔  **/
-        let sortArr = self.shellSort()
+//        let sortArr = self.shellSort()
+        /***** 归并  **/
+        let sortArr = self.insertionSort(arr: arr, left: 0, right: arr.count-1)
         
         print("\(sortArr)")
     }
@@ -162,6 +164,59 @@ class ViewController: UIViewController {
             }
         }
         self.recursiveShellSort(incremental: incremental/2)
+    }
+    
+    
+    // MARK: -------------------------
+    // MARK: 归并排序
+    func insertionSort(arr: [Int], left: Int, right: Int) -> [Int]{
+        if left == right {
+            return arr
+        }
+        
+        let mid = left + (right - left)/2
+        print("\(mid)")
+        var arr = insertionSort(arr: arr, left: left, right: mid)
+        
+        arr = insertionSort(arr: arr, left: mid + 1, right: right)
+        
+        return megerSort(arr: arr, leftPtr: left, rightPtr: mid + 1, rightBound: right)
+    }
+    
+    
+    /// - Parameters:
+    ///   - leftPtr: 左边起点
+    ///   - rightPtr: 右边的起点
+    ///   - rightBound: 右边终点
+    func megerSort(arr: [Int], leftPtr: Int, rightPtr: Int, rightBound: Int) -> [Int] {
+        var sortArr = arr
+        var leftPtr = leftPtr
+        var rightPtr = rightPtr
+        let mid = rightPtr - 1
+        var k = leftPtr
+        while leftPtr <= mid && rightPtr <= rightBound {
+            if arr[leftPtr] < arr[rightPtr] {
+                sortArr[k] = arr[leftPtr]
+                k+=1
+                leftPtr+=1
+            }else{
+                sortArr[k] = arr[rightPtr]
+                k+=1
+                rightPtr+=1
+            }
+        }
+        
+        while leftPtr <= mid {
+            sortArr[k] = arr[leftPtr]
+            k+=1
+            leftPtr+=1
+        }
+        while rightPtr <= rightBound {
+            sortArr[k] = arr[rightPtr]
+            k+=1
+            rightPtr+=1
+        }
+        return sortArr
     }
     
     

@@ -23,7 +23,12 @@ class ViewController: UIViewController {
         /***** 希尔  **/
 //        let sortArr = self.shellSort()
         /***** 归并  **/
-        let sortArr = self.insertionSort(arr: arr, left: 0, right: arr.count-1)
+//        let sortArr = self.insertionSort(arr: arr, left: 0, right: arr.count-1)
+        /***** 快排  **/
+//        let sortArr = self.quickRecursiveSort(arr, leftBound: 0, rightBound: arr.count - 1)
+        
+        /***** 计数  **/
+        let sortArr = self.countSort(arr: arr)
         
         print("\(sortArr)")
     }
@@ -31,7 +36,7 @@ class ViewController: UIViewController {
     
     
     // MARK: -------------------------
-    // MARK: 冒泡
+    // MARK: 冒泡（时间复杂程度 O(n^2） 最多的时候O(n^2） 最少O(n）） 空间复杂程度 O(1) 稳定
     /***** 冒泡排序  **/
     func bubbleSort(arr: [Int]) -> [Int] {
         var sortArr = arr
@@ -69,7 +74,7 @@ class ViewController: UIViewController {
     }
     
     // MARK: -------------------------
-    // MARK: 选择
+    // MARK: 选择 （时间复杂程度 O(n^2） 最多的时候O(n^2） 最少O(n^2）） 空间复杂程度 O(1) 不稳定
     /***** 选择排序  **/
     func choiceSort(arr: [Int]) -> [Int] {
         var sortArr = arr
@@ -110,7 +115,7 @@ class ViewController: UIViewController {
     
     
     // MARK: -------------------------
-    // MARK: 插入
+    // MARK: 插入 （时间复杂程度 O(n^2） 最多的时候O(n^2） 最少O(n）） 空间复杂程度 O(1) 稳定
     func insertionSort(arr: [Int]) -> [Int] {
         var sortArr = arr
         let count = arr.count
@@ -142,7 +147,7 @@ class ViewController: UIViewController {
     }
     
     // MARK: -------------------------
-    // MARK: 希尔排序
+    // MARK: 希尔排序 （时间复杂程度 O(n^1.3） 最多的时候O(n^2） 最少O(n）） 空间复杂程度 O(1) 不稳定
     
     var data: [Int] = [2,4,5,6,3,1,9,7,8,10]
     func shellSort() -> [Int] {
@@ -168,17 +173,17 @@ class ViewController: UIViewController {
     
     
     // MARK: -------------------------
-    // MARK: 归并排序
-    func insertionSort(arr: [Int], left: Int, right: Int) -> [Int]{
+    // MARK: 归并排序 （时间复杂程度 O(nlog2n） 最多的时候O(nlog2n） 最少O(nlog2n）） 空间复杂程度 O(n) 稳定
+    func megerRecursiveSort(arr: [Int], left: Int, right: Int) -> [Int]{
         if left == right {
             return arr
         }
         
         let mid = left + (right - left)/2
         print("\(mid)")
-        var arr = insertionSort(arr: arr, left: left, right: mid)
+        var arr = megerRecursiveSort(arr: arr, left: left, right: mid)
         
-        arr = insertionSort(arr: arr, left: mid + 1, right: right)
+        arr = megerRecursiveSort(arr: arr, left: mid + 1, right: right)
         
         return megerSort(arr: arr, leftPtr: left, rightPtr: mid + 1, rightBound: right)
     }
@@ -219,10 +224,76 @@ class ViewController: UIViewController {
         return sortArr
     }
     
+    // MARK: -------------------------
+    // MARK: 快速排序 （时间复杂程度 O(nlog2n） 最多的时候O(n^2） 最少O(nlog2n）） 空间复杂程度 O(nlog2n) 稳定
+    func quickRecursiveSort(_ arr: [Int], leftBound: Int, rightBound: Int) -> [Int] {
+        if leftBound >= rightBound {
+            return arr
+        }
+        let (sortArr, mid) =  self.quickSort(arr: arr, leftBound: leftBound, rightBound: rightBound)
+            
+        let leftArr = self.quickRecursiveSort(sortArr, leftBound: leftBound, rightBound: mid)
+        let rightArr =  self.quickRecursiveSort(leftArr, leftBound: mid + 1, rightBound: rightBound)
+        
+        return rightArr
+    }
     
+    /*****
+     1.两端交换
+     2.两端扫描，一端留坑，一端填坑
+     3.一端扫描，
+     **/
+    func quickSort(arr: [Int], leftBound: Int, rightBound: Int) -> ([Int],Int) {
+        let anchor = arr[rightBound]
+        
+        var sortArr = arr
+        
+        var leftPtr = leftBound
+        var rightPtr = rightBound - 1
+        while leftPtr < rightPtr {
+            if sortArr[leftPtr] > anchor && sortArr[rightPtr] <= anchor {
+                sortArr.swapAt(leftPtr, rightPtr)
+                leftPtr+=1
+                rightPtr-=1
+                
+                print("\(leftPtr), \(rightPtr)")
+            }
+            
+            if sortArr[leftPtr] <= anchor {
+                leftPtr+=1
+                print("\(leftPtr), \(rightPtr)")
+            }
+            if sortArr[rightPtr] > anchor{
+                rightPtr-=1
+                print("\(leftPtr), \(rightPtr)")
+            }
+        }
+        
+        if rightPtr+1 != rightBound {
+            sortArr.swapAt(leftPtr, rightBound)
+        }
+        print("--------(\(sortArr)")
+        return (sortArr,leftPtr)
+    }
     
-    
-    
+    // MARK: -------------------------
+    //k 是数据范围的大小
+    // MARK: 计数排序 （时间复杂程度 O(n+k） 最多的时候O(n+k） 最少O(n+k）） 空间复杂程度 O(n+k) 稳定
+    func countSort(arr: [Int]) -> [Int] {
+        var countArr = Array<Int>.init(repeating: 0, count: 10)
+        var sortArr = arr
+        for i in arr {
+            countArr[i]+=1
+        }
+        var j = 0
+        for (value, count) in countArr.enumerated() {
+            for _ in 0..<count {
+                sortArr[j] = value
+                j+=1
+            }
+        }
+        return sortArr
+    }
     
     
 }

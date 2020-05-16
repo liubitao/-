@@ -10,7 +10,7 @@ import UIKit
 class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        let arr = [2,4,5,6,3,1,9,7,8]
+//        let arr = [2,4,5,6,3,1,9,7,8]
         /***** 冒泡  **/
         //        let sortArr = self.bubbleSort(arr: arr)
         
@@ -28,7 +28,8 @@ class ViewController: UIViewController {
 //        let sortArr = self.quickRecursiveSort(arr, leftBound: 0, rightBound: arr.count - 1)
         
         /***** 计数  **/
-        let sortArr = self.countSort(arr: arr)
+        let arr = [223,412,523,645,376,187,987,75,8]
+        let sortArr = self.radixSort(arr: arr)
         
         print("\(sortArr)")
     }
@@ -148,7 +149,6 @@ class ViewController: UIViewController {
     
     // MARK: -------------------------
     // MARK: 希尔排序 （时间复杂程度 O(n^1.3） 最多的时候O(n^2） 最少O(n）） 空间复杂程度 O(1) 不稳定
-    
     var data: [Int] = [2,4,5,6,3,1,9,7,8,10]
     func shellSort() -> [Int] {
         
@@ -296,5 +296,63 @@ class ViewController: UIViewController {
     }
     
     
+    func optimizeCountSort(arr: [Int]) -> [Int] {
+        var countArr = Array<Int>.init(repeating: 0, count: 10)
+        var sortArr = arr
+        for value in arr{
+            countArr[value]+=1
+        }
+        
+        /***** 数据累加  **/
+        for (index, value) in countArr.enumerated() {
+            if index > 0 {
+                countArr[index] = value + countArr[index - 1]
+            }
+        }
+        
+        for i in 0..<arr.count {
+            let index = countArr[arr[i]] - 1
+            countArr[arr[i]] = index
+            sortArr[index] = arr[i]
+        }
+        return sortArr
+    }
+    
+    // MARK: -------------------------
+    // MARK: 基数排序 （时间复杂程度 O(n*k） 最多的时候O(n*k） 最少O(n*k）） 空间复杂程度 O(n+k) 稳定
+    func radixSort(arr: [Int]) -> [Int] {
+        var sortArr = arr
+        
+        /***** 获取最大的位数  **/
+        var count = 0
+        for value in arr {
+            count = String(value).count > count ? String(value).count : count
+        }
+        
+        for i in 0..<count {
+            var countArr = Array<Int>.init(repeating: 0, count: 10)
+            let division = Int(powf(10, Float(i)))
+            for j in 0..<sortArr.count {
+                let num = sortArr[j]/division%10
+                countArr[num]+=1
+            }
+            
+            for countIndex in 1..<countArr.count {
+                countArr[countIndex]+=countArr[countIndex - 1]
+            }
+            
+            let resultArr = sortArr
+            for n in stride(from: sortArr.count-1, through: 0, by: -1) {
+                /***** 获取到countArr的下标  **/
+                let num = resultArr[n]/division%10
+                /***** 获取到当前值排序应该所在的下标  **/
+                let index = countArr[num] - 1
+                countArr[num] = index
+                sortArr[index] = resultArr[n]
+                
+            }
+        }
+        return sortArr
+    }
 }
 

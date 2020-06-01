@@ -10,7 +10,7 @@ import UIKit
 class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let arr = [2,4,5,6,3,1,9,7,8]
+        let arr = [2,4,5,6,3,1,9,7,8]
         /***** 冒泡  **/
         //        let sortArr = self.bubbleSort(arr: arr)
         
@@ -28,8 +28,11 @@ class ViewController: UIViewController {
 //        let sortArr = self.quickRecursiveSort(arr, leftBound: 0, rightBound: arr.count - 1)
         
         /***** 计数  **/
-        let arr = [223,412,523,645,376,187,987,75,8]
-        let sortArr = self.radixSort(arr: arr)
+//        let arr = [223,412,523,645,376,187,987,75,8]
+//        let sortArr = self.radixSort(arr: arr)
+        
+        /***** 桶排序  **/
+        let sortArr = self.bucketSort(arr: arr)
         
         print("\(sortArr)")
     }
@@ -350,6 +353,66 @@ class ViewController: UIViewController {
                 countArr[num] = index
                 sortArr[index] = resultArr[n]
                 
+            }
+        }
+        return sortArr
+    }
+    
+    // MARK: -------------------------
+    // MARK: 桶排序 （时间复杂程度 O(n+k） 最多的时候O(n^2） 最少O(n）） 空间复杂程度 O(n+k) 稳定
+    private var bucket = 5
+    func bucketSort(arr:[Int]) -> [Int] {
+        var max:Int = arr[0]   //最大值
+        var min:Int = arr[0]   //最小值
+        
+        for item in arr {
+            //找出最大值
+            max = max < item ? item : max
+            //找出最小值
+            min = min < item ? min : item
+        }
+        //获取桶的个数
+        let buckets = bucketCount(min: min, max: max, arr: arr)
+        var bucketList:[[Int]] = Array()
+        for _ in 0..<buckets {
+            bucketList.append([Int]())
+        }
+        
+        // 将数据分配到各个桶中
+        for item in arr {
+            let index = (item - min) / bucket
+            var items = bucketList[index]
+            items.append(item)
+            bucketList[index] = items
+        }
+        
+        // 对每个桶进行排序，这里使用了插入排序
+        var resultList:[Int] = Array()
+        for items in bucketList {
+            let sorts = insertSorting(arr: items)
+            resultList += sorts
+        }
+        
+        
+        return resultList
+    }
+    
+    
+    ///获取桶的个数
+    func bucketCount(min:Int,max:Int,arr:[Int]) -> Int {
+        let num1 = (max - min + 1) / bucket
+        let num2 = (max - min + 1) % 5 > 0 ? 1 : 0
+        
+        return num1 + num2
+    }
+    //插入排序
+    func insertSorting(arr:[Int]) -> [Int]{
+        var sortArr = arr
+        for i in 0..<sortArr.count {
+            for j in stride(from: i, to: 0, by: -1) {
+                if sortArr[j] < sortArr[j-1]{
+                    sortArr.swapAt(j, j-1)
+                }
             }
         }
         return sortArr
